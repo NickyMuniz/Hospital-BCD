@@ -1,0 +1,127 @@
+# Hospital DB
+
+## Sobre o projeto
+
+O Hospital DB consiste no desenvolvimento de um banco de dados relacional para representar o funcionamento de um ambiente hospitalar. O projeto organiza informações de pacientes, médicos, consultas, internações, quartos e prescrições médicas, estabelecendo relacionamentos entre as entidades.
+
+A estrutura foi desenvolvida em MySQL e contempla a criação de tabelas, definição de chaves primárias e estrangeiras, inserção e consulta de dados, além da aplicação de diferentes recursos da linguagem SQL.
+
+## Tecnologias utilizadas
+
+- MySQL
+- SQL
+
+## Estrutura do banco de dados
+
+O banco de dados é composto por seis tabelas:
+
+- **Pacientes:** informações pessoais e convênios.
+- **Médicos:** identificação, CRM e especialidades.
+- **Quartos:** número, andar, tipo e disponibilidade.
+- **Internações:** registros de internações e valores das diárias.
+- **Consultas:** registros de atendimentos, médicos responsáveis e valores.
+- **Prescrições:** medicamentos, dosagens e quantidades prescritas.
+
+## Consultas SQL
+
+As consultas a seguir exploram diferentes operações de seleção, filtragem, agrupamento e agregação de dados, considerando situações relacionadas à gestão hospitalar.
+
+Faturamento Total de Consultas por Convênio
+
+Calcula o valor total arrecadado em consultas para convênios que possuem "Saúde" no nome.
+
+SELECT pacientes.convenio,
+       SUM(consultas.valor_consulta) AS total
+FROM consultas
+INNER JOIN pacientes
+ON consultas.id_paciente = pacientes.id_paciente
+WHERE pacientes.convenio LIKE '%Saúde%'
+GROUP BY pacientes.convenio;
+
+2. Valor Médio das Diárias por Tipo de Quarto
+
+Calcula a média dos valores das diárias de internação por tipo de quarto.
+
+SELECT
+    q.tipo_quarto AS tipo_quarto,
+    ROUND(AVG(i.valor_diaria), 2) AS valor_medio_diaria
+FROM internacoes i
+JOIN quartos q ON q.id_quarto = i.id_quarto
+WHERE q.tipo_quarto IN ('Apartamento', 'UTI', 'Enfermaria', 'Suíte VIP')
+GROUP BY q.tipo_quarto;
+
+3. Total de Consultas por Médico
+
+Apresenta a soma dos valores das consultas realizadas ou finalizadas por médico.
+
+SELECT m.nome_medico,
+       SUM(c.valor_consulta) AS total_consultas
+FROM consultas c
+JOIN medicos m ON m.id_medico = c.id_medico
+WHERE c.status_consulta IN ('Realizada', 'Finalizada')
+GROUP BY m.id_medico, m.nome_medico;
+
+4. Contagem de Prescrições por Status da Consulta
+
+Conta as prescrições de medicamentos que contenham Dipirona ou Paracetamol, agrupadas pelo status da consulta.
+
+SELECT c.status_consulta,
+       COUNT(*) AS total_prescricoes
+FROM prescricoes pr
+JOIN consultas c ON c.id_consulta = pr.id_consulta
+WHERE pr.medicamento LIKE '%Dipirona%'
+   OR pr.medicamento LIKE '%Paracetamol%'
+GROUP BY c.status_consulta;
+
+5. Média do Valor de Consultas por Convênio e Especialidade
+
+Calcula a média dos valores das consultas para convênios que possuem "Unimed" no nome, agrupando por convênio e especialidade médica.
+
+SELECT p.convenio,
+       m.especialidade,
+       ROUND(AVG(c.valor_consulta), 2) AS valor_medio
+FROM consultas c
+JOIN pacientes p ON p.id_paciente = c.id_paciente
+JOIN medicos m ON m.id_medico = c.id_medico
+WHERE p.convenio LIKE '%Unimed%'
+GROUP BY p.convenio, m.especialidade;
+
+6. Média de Diárias de Internação por Convênio em Quartos de UTI
+
+Calcula o valor médio das diárias de internação por convênio, considerando apenas quartos do tipo UTI.
+
+SELECT p.convenio,
+       ROUND(AVG(i.valor_diaria), 2) AS valor_medio_diaria
+FROM internacoes i
+JOIN pacientes p ON p.id_paciente = i.id_paciente
+JOIN quartos q ON q.id_quarto = i.id_quarto
+WHERE q.tipo_quarto = 'UTI'
+GROUP BY p.convenio;
+
+7. Medicamentos Prescritos por Médico em Consultas Realizadas
+
+Conta a quantidade de itens prescritos por médico, considerando apenas consultas com status "Realizada".
+
+SELECT m.nome_medico,
+       COUNT(pr.id_prescricao) AS total_itens
+FROM prescricoes pr
+JOIN consultas c ON c.id_consulta = pr.id_consulta
+JOIN medicos m ON m.id_medico = c.id_medico
+WHERE c.status_consulta = 'Realizada'
+GROUP BY m.id_medico, m.nome_medico;
+
+8. Valor Total e Média de Consultas por Paciente
+
+Apresenta o valor total e a média dos gastos com consultas de pacientes cujos nomes começam com a letra "M".
+
+SELECT p.nome_paciente,
+       SUM(c.valor_consulta) AS total_gasto,
+       ROUND(AVG(c.valor_consulta), 2) AS media_gasto
+FROM consultas c
+JOIN pacientes p ON p.id_paciente = c.id_paciente
+WHERE p.nome_paciente LIKE 'M%'
+GROUP BY p.id_paciente, p.nome_paciente;
+
+## Considerações finais
+
+O desenvolvimento do banco de dados permitiu aplicar conceitos de bancos de dados relacionais e explorar recursos do MySQL na organização, manipulação e análise de informações.
