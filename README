@@ -1,17 +1,27 @@
+<div align="center">
+
 # Hospital DB
 
-## Sobre o projeto
+**Banco de Dados Hospitalar**
+
+Desenvolvido em MySQL
+
+</div>
+
+---
+
+## 📌 Sobre o projeto
 
 O Hospital DB consiste no desenvolvimento de um banco de dados relacional para representar o funcionamento de um ambiente hospitalar. O projeto organiza informações de pacientes, médicos, consultas, internações, quartos e prescrições médicas, estabelecendo relacionamentos entre as entidades.
 
 A estrutura foi desenvolvida em MySQL e contempla a criação de tabelas, definição de chaves primárias e estrangeiras, inserção e consulta de dados, além da aplicação de diferentes recursos da linguagem SQL.
 
-## Tecnologias utilizadas
+## 🛠️ Tecnologias utilizadas
 
 - MySQL
 - SQL
 
-## Estrutura do banco de dados
+## 🗂️ Estrutura do banco de dados
 
 O banco de dados é composto por seis tabelas:
 
@@ -22,13 +32,13 @@ O banco de dados é composto por seis tabelas:
 - **Consultas:** registros de atendimentos, médicos responsáveis e valores.
 - **Prescrições:** medicamentos, dosagens e quantidades prescritas.
 
-## Consultas SQL
+## 🧱 Criação das tabelas
 
 As consultas a seguir exploram diferentes operações de seleção, filtragem, agrupamento e agregação de dados, considerando situações relacionadas à gestão hospitalar.
 
 Faturamento Total de Consultas por Convênio
 
-Calcula o valor total arrecadado em consultas para convênios que possuem "Saúde" no nome.
+1. Calcula o valor total arrecadado em consultas para convênios que possuem "Saúde" no nome.
 
 SELECT pacientes.convenio,
        SUM(consultas.valor_consulta) AS total
@@ -122,6 +132,33 @@ JOIN pacientes p ON p.id_paciente = c.id_paciente
 WHERE p.nome_paciente LIKE 'M%'
 GROUP BY p.id_paciente, p.nome_paciente;
 
-## Considerações finais
+9. Média do Valor de Consulta por Especialidade Médica
+
+Calcula a média dos valores das consultas realizadas nas especialidades relacionadas à Cardiologia.
+
+```sql
+SELECT m.especialidade,
+       ROUND(AVG(c.valor_consulta), 2) AS valor_medio
+FROM consultas c
+JOIN medicos m ON m.id_medico = c.id_medico
+WHERE m.especialidade LIKE '%Cardiologia%'
+GROUP BY m.especialidade;
+```
+
+10. Soma de Diárias por Paciente com Sobrenome "Silva"
+
+Calcula a soma acumulada dos valores das diárias de internação dos pacientes que possuem o sobrenome "Silva".
+
+```sql
+SELECT p.nome_paciente,
+       SUM(i.valor_diaria) AS total_diarias
+FROM internacoes i
+JOIN pacientes p ON p.id_paciente = i.id_paciente
+WHERE p.nome_paciente LIKE '% Silva'
+GROUP BY p.id_paciente, p.nome_paciente;
+```
+
+
+## 📝 Considerações finais
 
 O desenvolvimento do banco de dados permitiu aplicar conceitos de bancos de dados relacionais e explorar recursos do MySQL na organização, manipulação e análise de informações.
